@@ -1,11 +1,13 @@
 import math
 import cv2
 import numpy as np
+import time
 
+startTime = time.time()
 # read inputs
 
 blockSize = 3
-size=2
+size = 1
 typeOfFloat = 'float64'
 
 # inputs validation
@@ -136,6 +138,9 @@ np.save('dictionaryBlue.npy', DictionaryBlue)
 DictionaryGreen = np.array(dictionaryGreen, dtype=typeOfFloat)
 np.save('dictionaryGreen.npy', DictionaryGreen)
 
+print("encoding time in seconds",time.time()-startTime)
+
+startTime=time.time()
 dictionaryRed = np.load('dictionaryRed.npy', allow_pickle=True)
 dictionaryBlue = np.load('dictionaryBlue.npy', allow_pickle=True)
 dictionaryGreen = np.load('dictionaryGreen.npy', allow_pickle=True)
@@ -186,8 +191,6 @@ while len(decodingDictionaryBlue) < height*wedth/(size*size):
 
 
 
-
-decodingDictionary=np.array(decodingDictionaryRed)
 # # reshape decoded image and save it
 def reshape():
     imageRed = np.reshape(decodingDictionaryRed, (height / size, wedth / size))
@@ -213,6 +216,18 @@ def reshape():
 
 arrheight=reshape()
 image = np.reshape(arrheight, (height,wedth,3))
+im=np.reshape((image-img),(height*wedth*3))
+
+MSE=0
+for x in im:
+    MSE+=int(pow(x,2))
+MSE=MSE/(height*wedth*3.0)
+if(MSE!=0.0):
+    PSNR = 10 * math.log10((pow(255, 2)) / MSE)
+    print(PSNR)
+
+
+print("decoding time in seconds",time.time()-startTime)
 
 cv2.imwrite('image.png', image)
 cv2.waitKey(0)
