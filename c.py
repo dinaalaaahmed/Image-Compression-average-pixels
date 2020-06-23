@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import time
 
-startTime = time.time()
 
 
 image_name = 'r.bmp'
@@ -33,11 +32,12 @@ for x in range(10):
 print(arr_height)
 print("please enter the height size of the average window from the previous array: ")
 size_height = input()
-
 print(arr_width)
 print("please enter the width size  of the average window from the previous array: ")
 
 size_width = input()
+
+startTime = time.time()
 
 # average the neighbouring pixels with window size of (size_height*size_width)
 arrheightRed = []
@@ -100,12 +100,12 @@ def startEnd(flattenImage):
 
     # calculate the upper and lower ranges of the image
     startD = 0
-    start = {}
-    end = {}
+    start = []
+    end = []
 
     for x in range(256):
-        start[x] = startD
-        end[x] = start[x] + probability[x]
+        start.append(startD)
+        end.append(startD + probability[x])
         startD = end[x]
     return start, end
 
@@ -148,7 +148,13 @@ dictionaryGreen = encode_array(flattenImageGreen, startGreen, EndGreen)
 DictionaryRed = np.array(dictionaryRed, dtype=typeOfFloat)
 DictionaryBlue = np.array(dictionaryBlue, dtype=typeOfFloat)
 DictionaryGreen = np.array(dictionaryGreen, dtype=typeOfFloat)
-np.savez('dictionary.npz', array1=DictionaryRed, array2=DictionaryGreen, array3=DictionaryBlue)
+start_green = np.array(startGreen, dtype='float64')
+end_green = np.array(EndGreen, dtype='float64')
+start_blue = np.array(startBlue, dtype='float64')
+end_blue = np.array(EndBlue, dtype='float64')
+start_red = np.array(startRed, dtype='float64')
+end_red = np.array(EndRed, dtype='float64')
+np.savez('dictionary.npz', array1=DictionaryRed, array2=DictionaryGreen, array3=DictionaryBlue, array4=start_red, array5=end_red, array6=start_green, array7=end_green, array8=start_blue, array9=end_blue)
 
 print("encoding time in seconds", time.time()-startTime)
 
@@ -191,6 +197,13 @@ def decode_arithmetic(dictionary, start, end):
         binary_search(start, end, 0, 255, i, 0, 1, blockSize, 0, decodingDictionary)
     return decodingDictionary
 
+
+startRed = data['array4']
+EndRed = data['array5']
+startBlue = data['array8']
+EndBlue = data['array9']
+startGreen = data['array6']
+EndGreen = data['array7']
 
 decodingDictionaryRed = decode_arithmetic(dictionaryRed, startRed, EndRed)
 decodingDictionaryBlue = decode_arithmetic(dictionaryBlue, startBlue, EndBlue)
